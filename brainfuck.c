@@ -26,10 +26,10 @@ int main(int argc, char *argv[]){
 	while((inChar=fgetc(infile)) != EOF){
 		switch(inChar){
 			case '<':
-				memcell-=2;
+				memcell = (memcell-1) % memsize;
+				break;
 			case '>':
-				memcell+=1;
-				memcell%=256;
+				memcell = (memcell+1) % memsize;
 				break;
 			case '+':
 				buffer[memcell]++;
