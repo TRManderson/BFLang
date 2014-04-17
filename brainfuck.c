@@ -22,11 +22,12 @@ block *last(block *start){
 	return start;
 }
 
-char* fill(int n, char val){
+char *fill(int n, char val){
 	char* returnPtr = malloc(n);
 	for(;n>0;n--){
 		returnPtr[n-1]=val;
 	}
+	return returnPtr;
 }
 
 int main(int argc, char *argv[]){
@@ -59,7 +60,7 @@ int main(int argc, char *argv[]){
 				buffer[memcell]=getchar();
 				break;
 			case '.':
-				putc(buffer[memcell], stdout);
+				putchar(buffer[memcell]);
 				break;
 			case '[':
 				if(buffer[memcell]){
@@ -78,15 +79,18 @@ int main(int argc, char *argv[]){
 			case ']':
 				lastBlock=last(blockList);
 				curBlock=blockList;
-				fsetpos(infile,lastBlock->fPointer);
-				if(lastBlock==blockList){
-					free(blockList);
-					blockList=0;
-					break;
+				if(buffer[memcell]){
+					fsetpos(infile,lastBlock->fPointer);
+				}else{
+					if(lastBlock==blockList){
+						free(blockList);
+						blockList=0;
+						break;
+					}
+					while(curBlock->next != lastBlock && curBlock->next !=0) curBlock=curBlock->next;
+					curBlock->next=0;
+					free(lastBlock);
 				}
-				while(curBlock->next != lastBlock && curBlock->next !=0) curBlock=curBlock->next;
-				curBlock->next=0;
-				free(lastBlock);
 				break;
 			default:
 				break;
