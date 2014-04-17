@@ -7,37 +7,18 @@ typedef struct blockListing{
 	struct blockListing *next;
 }block;
 
-block *addBlock(FILE *infile, block *start){
-	block *returnPtr=malloc(sizeof(block));
-	while(start->next != 0) start=start->next;
-	start->next=returnPtr;
-	returnPtr->next=0;
-	returnPtr->fPointer=malloc(sizeof(fpos_t));
-	fgetpos(infile, returnPtr->fPointer);
-	return returnPtr;
-}
-
 block *last(block *start){
 	while(start->next !=0) start=start->next;
 	return start;
 }
 
-char *fill(int n, char val){
-	char* returnPtr = malloc(n);
-	for(;n>0;n--){
-		returnPtr[n-1]=val;
-	}
-	return returnPtr;
-}
-
 int main(int argc, char *argv[]){
 	//Initialise
-	char* buffer;
 	int memsize=256;
-	buffer=fill(memsize,0);
+	char* buffer=malloc(memsize);
 	int memcell=0;
-	FILE *infile;
-	infile=fopen(argv[1],"r");
+	for(memcell=memsize;memcell>0;memcell--)buffer[memcell-1]=0;
+	FILE *infile = fopen(argv[1],"r");
 	char inChar;
 	block *blockList=0;
 	block *curBlock=0;
@@ -45,10 +26,10 @@ int main(int argc, char *argv[]){
 	while((inChar=fgetc(infile)) != EOF){
 		switch(inChar){
 			case '<':
-				memcell=(memcell-1)%memsize;
-				break;
+				memcell-=2;
 			case '>':
-				memcell=(memcell+1)%memsize;
+				memcell+=1;
+				memcell%=256;
 				break;
 			case '+':
 				buffer[memcell]++;
@@ -70,11 +51,14 @@ int main(int argc, char *argv[]){
 						blockList->fPointer=malloc(sizeof(fpos_t));
 						fgetpos(infile,blockList->fPointer);
 					}else{
-						addBlock(infile, blockList);
+						lastBlock=last(blockList);
+						lastBlock->next=malloc(sizeof(block));
+						lastBlock=lastBlock->next;
+						lastBlock->next=0;
+						lastBlock->fPointer=malloc(sizeof(fpos_t));
+						fgetpos(infile, lastBlock->fPointer);
 					}
-				}else{
-					while(inChar!=']')inChar=fgetc(infile);
-				}
+				}else while(inChar=fgetc(infile) !=']');
 				break;
 			case ']':
 				lastBlock=last(blockList);
@@ -91,7 +75,6 @@ int main(int argc, char *argv[]){
 					curBlock->next=0;
 					free(lastBlock);
 				}
-				break;
 			default:
 				break;
 		}
