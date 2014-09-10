@@ -1,4 +1,3 @@
-//Brainfuck Interpreted
 #include <stdio.h>
 #include <stdlib.h>
 
